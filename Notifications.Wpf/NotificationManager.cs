@@ -7,7 +7,8 @@ using Notifications.Wpf.Controls;
 
 namespace Notifications.Wpf
 {
-    public class NotificationManager : INotificationManager
+    public class NotificationManager 
+        : INotificationManager
     {
         private readonly Dispatcher _dispatcher;
         private static readonly List<NotificationArea> Areas = new List<NotificationArea>();
@@ -23,8 +24,7 @@ namespace Notifications.Wpf
             _dispatcher = dispatcher;
         }
 
-        public void Show(object content, string areaName = "", TimeSpan? expirationTime = null, Action onClick = null,
-            Action onClose = null)
+        public void Show(object content, string areaName = "", TimeSpan? expirationTime = null, Action onClick = null, Action onClose = null, Window parent = null)
         {
             if (!_dispatcher.CheckAccess())
             {
@@ -44,7 +44,8 @@ namespace Notifications.Wpf
                     Left = workArea.Left,
                     Top = workArea.Top,
                     Width = workArea.Width,
-                    Height = workArea.Height
+                    Height = workArea.Height,
+                    Owner = parent ?? Application.Current.MainWindow
                 };
 
                 _window.Show();
