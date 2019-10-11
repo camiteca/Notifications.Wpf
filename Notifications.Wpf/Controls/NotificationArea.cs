@@ -111,8 +111,10 @@ namespace Notifications.Wpf.Controls
 
             var window = Window.GetWindow(this);
 
-            window.Height = window.Height + notification.Height;
-            window.Top = SystemParameters.FullPrimaryScreenHeight - notification.Height;
+            FrameworkElement content = (FrameworkElement)notification.Content;
+
+            window.Height = window.Height - content.Height;
+            window.Top = SystemParameters.FullPrimaryScreenHeight - window.Height;
 
             _items.Remove(notification);
 

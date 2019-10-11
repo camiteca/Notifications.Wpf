@@ -24,7 +24,7 @@ namespace Notifications.Wpf
             _dispatcher = dispatcher;
         }
 
-        public void Show(FrameworkElement content, string areaName = "", TimeSpan? expirationTime = null, Action onClick = null, Action onClose = null, Window parent = null, double width = 350, double height = 120)
+        public void Show(FrameworkElement content, string areaName = "", TimeSpan? expirationTime = null, Action onClick = null, Action onClose = null, Window parent = null)
         {
             if(content == null)
             {
@@ -47,8 +47,8 @@ namespace Notifications.Wpf
                 _window = new NotificationsOverlayWindow
                 {
                     Owner = parent ?? Application.Current.MainWindow,
-                    Width = width,
-                    Height = height,
+                    Width = content.Width,
+                    Height = content.Height,
                 };
 
                 _window.Left = SystemParameters.FullPrimaryScreenWidth - _window.Width;
@@ -58,7 +58,7 @@ namespace Notifications.Wpf
             }
             else
             {
-                _window.Height = _window.Height + height;
+                _window.Height = _window.Height + content.Height;
                 _window.Top = SystemParameters.FullPrimaryScreenHeight - _window.Height;
             }
 
