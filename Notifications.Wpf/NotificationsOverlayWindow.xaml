@@ -6,7 +6,7 @@
         xmlns:controls1="clr-namespace:Notifications.Wpf.Controls"
         mc:Ignorable="d"
         Title="ToastWindow"
-        Background="Transparent"
+        Background="Pink"
         ShowInTaskbar="False"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -14,5 +14,5 @@
         ShowActivated="False"
         d:DesignWidth="900"
         d:DesignHeight="600">
-    <controls1:NotificationArea Position="BottomRight" Margin="8"/>
+    <controls1:NotificationArea Position="BottomRight"/>
 </Window>

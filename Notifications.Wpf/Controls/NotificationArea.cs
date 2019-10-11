@@ -4,26 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace Notifications.Wpf.Controls
 {
     public class NotificationArea : Control
     {
-
-
-
         public NotificationPosition Position
         {
             get { return (NotificationPosition)GetValue(PositionProperty); }
             set { SetValue(PositionProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Position.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PositionProperty =
             DependencyProperty.Register("Position", typeof(NotificationPosition), typeof(NotificationArea), new PropertyMetadata(NotificationPosition.BottomRight));
-
 
         public int MaxItems
         {
@@ -50,30 +43,34 @@ namespace Notifications.Wpf.Controls
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
+
             var itemsControl = GetTemplateChild("PART_Items") as Panel;
+
             _items = itemsControl?.Children;
         }
 
-#if NET40
-        public void Show(object content, TimeSpan expirationTime, Action onClick, Action onClose)
-#else
-        public async void Show(object content, TimeSpan expirationTime, Action onClick, Action onClose)
-#endif
+        public async void Show(FrameworkElement content, TimeSpan expirationTime, Action onClick, Action onClose)
         {
             var notification = new Notification
             {
                 Content = content
             };
-            
+
             notification.MouseLeftButtonDown += (sender, args) =>
             {
                 if (onClick != null)
                 {
                     onClick.Invoke();
+
                     (sender as Notification)?.Close();
                 }
             };
-            notification.NotificationClosed += (sender, args) => onClose?.Invoke();
+
+            notification.NotificationClosed += (sender, args) =>
+            {
+                onClose?.Invoke();
+            };
+
             notification.NotificationClosed += OnNotificationClosed;
 
             if (!IsLoaded)
@@ -98,46 +95,32 @@ namespace Notifications.Wpf.Controls
                 }
             }
 
-#if NET40 
-            DelayExecute(expirationTime, () =>
-            {
-#else
             if (expirationTime == TimeSpan.MaxValue)
             {
                 return;
             }
+
             await Task.Delay(expirationTime);
-#endif
-                notification.Close();
-#if NET40
-            });
-#endif
+
+            notification.Close();
         }
 
         private void OnNotificationClosed(object sender, RoutedEventArgs routedEventArgs)
         {
             var notification = sender as Notification;
-            _items.Remove(notification);
-        }
 
-#if NET40
-        private static void DelayExecute(TimeSpan delay, Action actionToExecute)
-        {
-            if (actionToExecute != null)
+            var window = Window.GetWindow(this);
+
+            window.Height = window.Height + notification.Height;
+            window.Top = SystemParameters.FullPrimaryScreenHeight - notification.Height;
+
+            _items.Remove(notification);
+
+            if(_items.Count == 0)
             {
-                var timer = new DispatcherTimer
-                {
-                    Interval = delay
-                };
-                timer.Tick += (sender, args) =>
-                {
-                    timer.Stop();
-                    actionToExecute();
-                };
-                timer.Start();
+                NotificationManager.CloseNotificationArea();
             }
         }
-#endif
     }
 
     public enum NotificationPosition
